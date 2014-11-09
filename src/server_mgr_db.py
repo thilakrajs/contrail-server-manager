@@ -120,6 +120,8 @@ class ServerMgrDb:
                 # Add columns for server_table
                 self._add_table_column(cursor, server_table, "reimaged_id", "TEXT")
                 self._add_table_column(cursor, server_table, "provisioned_id", "TEXT")
+                self._add_table_column(cursor, server_table, "network", "TEXT")
+                self._add_table_column(cursor, server_table, "contrail", "TEXT")
 
             self._get_table_columns()
             self._smgr_log.log(self._smgr_log.DEBUG, "Created tables")
