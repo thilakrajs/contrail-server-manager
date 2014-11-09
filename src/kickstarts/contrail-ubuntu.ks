@@ -112,6 +112,12 @@ EOF
 # Get puppet repo
 apt-get update
 apt-get -y install puppet
+apt-get -y install python-netaddr
+apt-get -y install ifenslave
+
+wget http://$server/contrail/server_interface_config/$system_name.sh
+chmod +x $system_name.sh
+./$system_name.sh
 
 #--------------------------------------------------------------------------
 #Set up the ntp client 
