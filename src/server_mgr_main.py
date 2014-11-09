@@ -2338,7 +2338,7 @@ class VncServerManager():
                 #form string
                 if type.lower() == 'bond':
                     device_str+= ("./interface_setup.py \
---device %s --members %s --bond-opts  %s --ip %s\n") % \
+--device %s --members %s --bond-opts \"%s\" --ip %s\n") % \
                         (name, mem_intfs, bond_opts, ip_addr)
                     execute_script = True
                 else:
