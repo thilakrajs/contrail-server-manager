@@ -88,8 +88,21 @@ class ServerMgrPuppet:
     def get_control_ip(self, provision_params, mgmt_ip_str):
         intf_control = {}
         mgmt_ip = mgmt_ip_str.strip("\"")
+
+        if 'contrail_params' in  provision_params:
+            contrail_dict = eval(provision_params['contrail_params'])
+            control_data_intf = contrail_dict['control_data_interface']
+            if provision_params['interface_list'] and \
+                     provision_params['interface_list'] [control_data_intf]:
+                control_data_ip = provision_params['interface_list'] \
+                                [control_data_intf] ['ip']
+            if control_data_ip:
+                return '"' + str(IPNetwork(control_data_ip).ip) + '"'
+            else:
+                return '"' + provision_params['server_ip'] + '"'
+
         if provision_params['control_net'] [mgmt_ip]:
-            intf_control = eval(provision_params['control_net'] [mgmt_ip])        
+            intf_control = eval(provision_params['control_net'] [mgmt_ip]) 
         for intf,values in intf_control.items():
             if intf:
                 return '"' + str(IPNetwork(values['ip_address']).ip) + '"'
