@@ -2345,7 +2345,7 @@ class VncServerManager():
                     device_str+= ("/opt/contrail/setup-interface.py --device %s --ip %s=\n") % \
                                 (name, ip_addr)    
                     execute_script - True
-            sh_file_name = "/var/www/html/contrail/%s" % (server['id'])
+            sh_file_name = "/var/www/html/contrail/%s.sh" % (server['id'])
             f = open(sh_file_name, "w")  
             f.write(device_str)
             f.close()
