@@ -115,7 +115,8 @@ apt-get -y install puppet
 apt-get -y install python-netaddr
 apt-get -y install ifenslave
 
-wget http://$server/contrail/server_interface_config/$system_name.sh
+wget http://$server/kickstarts/interface_setup.py
+wget http://$server/contrail/config_file/$system_name.sh
 chmod +x $system_name.sh
 ./$system_name.sh
 
