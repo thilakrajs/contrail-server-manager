@@ -2337,12 +2337,12 @@ class VncServerManager():
 
                 #form string
                 if type.lower() == 'bond':
-                    device_str+= ("./interface_setup.py \
+                    device_str+= ("python interface_setup.py \
 --device %s --members %s --bond-opts \"%s\" --ip %s\n") % \
                         (name, mem_intfs, bond_opts, ip_addr)
                     execute_script = True
                 else:
-                    device_str+= ("./interface_setup.py --device %s --ip %s=\n") % \
+                    device_str+= ("python interface_setup.py --device %s --ip %s=\n") % \
                                 (name, ip_addr)    
                     execute_script - True
             sh_file_name = "/var/www/html/contrail/config_file/%s.sh" % (server['id'])
