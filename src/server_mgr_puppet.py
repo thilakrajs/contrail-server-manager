@@ -1371,7 +1371,17 @@ $__contrail_quantum_servers__
         provision_params["compute_non_mgmt_ip"] = provision_params["server_ip"]
         provision_params["compute_non_mgmt_gway"] = provision_params['server_gway']
 
-        if provision_params['intf_control']:
+
+        if 'contrail_params' in  provision_params:
+            contrail_dict = eval(provision_params['contrail_params'])
+            control_data_intf = contrail_dict['control_data_interface']
+            if provision_params['interface_list'] and \
+                     provision_params['interface_list'] [control_data_intf]:
+                non_mgmt_ip = provision_params['interface_list'] \
+                                [control_data_intf] ['ip']
+                non_mgmt_gw =  provision_params['interface_list'] \
+                                [control_data_intf] ['d_gw']
+        elif provision_params['intf_control']:
             intf_control = eval(provision_params['intf_control'])
             for intf,values in intf_control.items():
                 non_mgmt_ip= values['ip_address'].split("/")[0]
