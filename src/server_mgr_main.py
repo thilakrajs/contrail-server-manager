@@ -2340,7 +2340,7 @@ class VncServerManager():
                 mem_intfs = intf.get('member_interfaces', None)
 
                 #form string
-                if type.lower() == 'bond':
+                if type and type.lower() == 'bond':
                     device_str+= ("python interface_setup.py \
 --device %s --members %s --bond-opts \"%s\" --ip %s\n") % \
                         (name,
