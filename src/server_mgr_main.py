@@ -940,6 +940,10 @@ class VncServerManager():
             if x.get("intf_bond", None) is not None:
                 x['bond_interface'] = eval(x['intf_bond'])
                 x.pop('intf_bond', None)
+            if x.get("network", None) is not None:
+                x['network'] = eval(x['network'])
+            if x.get("contrail", None) is not None:
+                x['contrail'] = eval(x['contrail'])
             if detail:
                 x['tag'] = {}
                 for i in range(1, len(self._tags_list)+1):
