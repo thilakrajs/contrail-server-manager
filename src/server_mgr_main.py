@@ -2461,6 +2461,18 @@ class VncServerManager():
         for server in cluster_servers:
             if 'intf_control' not in server:
                     intf_control = ""
+            elif 'contrail' in server:
+		contrail_dict = eval(server['contrail'])
+		control_data_intf = contrail_dict['control_data_interface']
+
+		interface_list = self.get_interfaces(server)
+		intf_dict = {}
+		control_ip = interface_list[control_data_intf] ['ip']	
+		control_mask = interface_list[control_data_intf] ['mask']	
+ 		ip_prefix = "%s/%s" %(control_ip, control_mask)
+		ip_obj = IPNetwork(ip_prefix)
+		intf_dict[control_data_intf] = {"ip_address":str(ip_obj)}
+	        server_control_list[server['ip_address']] = str(intf_dict)
             else:
                 intf_control = server['intf_control']
                 server_control_list[server['ip_address']] = intf_control
@@ -2653,7 +2665,8 @@ class VncServerManager():
                 provision_params['keystone_tenant'] = cluster_params['keystone_tenant']
                 provision_params['analytics_data_ttl'] = cluster_params['analytics_data_ttl']
                 provision_params['phy_interface'] = server_params['interface_name']
-                provision_params['contrail_params']  = server['contrail']
+                if contrail in server:
+                    provision_params['contrail_params']  = server['contrail']
                 if 'gateway' in server and server['gateway']:
                     provision_params['server_gway'] = server['gateway']
                 elif 'gateway' in cluster_params and cluster_params['gateway']:
