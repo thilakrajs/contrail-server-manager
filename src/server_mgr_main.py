@@ -582,12 +582,16 @@ class VncServerManager():
 
         cluster_role_list = []
         for server in servers:
-            duplicate_roles = self.list_duplicates(eval(server['roles']))
+            if 'roles' in server and server['roles']:
+                role_list = eval(server['roles'])
+            else:
+                role_list = []
+            duplicate_roles = self.list_duplicates(role_list)
             if len(duplicate_roles):
                 msg = "Duplicate Roles '%s' present" % \
                         ", ".join(str(e) for e in duplicate_roles)
                 self.log_and_raise_exception(msg)
-            cluster_role_list.extend(eval(server['roles']))
+            cluster_role_list.extend(role_list)
 
         cluster_unique_roles = set(cluster_role_list)
 
