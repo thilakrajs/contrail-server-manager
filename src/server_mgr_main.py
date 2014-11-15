@@ -2348,8 +2348,8 @@ class VncServerManager():
                     device_str+= ("python interface_setup.py \
 --device %s --members %s --bond-opts \"%s\" --ip %s\n") % \
                         (name,
-		 mem_intfs.replace(",", " ").replace("[", "").replace("]","").replace("'",""),
-					 bond_opts, ip_addr)
+            			" ".join(mem_intfs),
+			            json.dumps(bond_opts), ip_addr)
                     execute_script = True
                 else:
                     device_str+= ("python interface_setup.py --device %s --ip %s\n") % \
