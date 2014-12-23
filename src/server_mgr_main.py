@@ -1019,9 +1019,9 @@ class VncServerManager():
             if x.get("intf_bond", None) is not None:
                 x['bond_interface'] = eval(x['intf_bond'])
                 x.pop('intf_bond', None)
-            if x.get("network", None) is not None:
+            if x.get("network", None):
                 x['network'] = eval(x['network'])
-            if x.get("contrail", None) is not None:
+            if x.get("contrail", None):
                 x['contrail'] = eval(x['contrail'])
 
             if detail:
@@ -2460,9 +2460,13 @@ class VncServerManager():
 			            json.dumps(bond_opts), ip_addr)
                     execute_script = True
                 else:
-                    device_str+= ("python interface_setup.py --device %s --ip %s\n") % \
-                                (name, ip_addr)    
-                    execute_script - True
+                    if dhcp:
+                        device_str+= ("python interface_setup.py --device %s --dhcp\n") % \
+                            (name)
+                    else:
+                        device_str+= ("python interface_setup.py --device %s --ip %s\n") % \
+                            (name, ip_addr)    
+                    execute_script = True
             sh_file_name = "/var/www/html/contrail/config_file/%s.sh" % (server['id'])
             f = open(sh_file_name, "w")  
             f.write(device_str)
@@ -2835,7 +2839,7 @@ class VncServerManager():
                 provision_params['keystone_tenant'] = cluster_params['keystone_tenant']
                 provision_params['analytics_data_ttl'] = cluster_params['analytics_data_ttl']
                 provision_params['phy_interface'] = server_params['interface_name']
-                if contrail in server:
+                if 'contrail' in server:
                     provision_params['contrail_params']  = server['contrail']
                 if 'gateway' in server and server['gateway']:
                     provision_params['server_gway'] = server['gateway']
@@ -3446,23 +3450,24 @@ class VncServerManager():
                 reimage_parameters.get('ipmi_username',self._args.ipmi_username),
                 reimage_parameters.get('ipmi_password',self._args.ipmi_password),
                 reimage_parameters.get('ipmi_address',''),
+                base_image, self._args.listen_ip_addr,
                 reimage_parameters.get('partition', ''),
                 reimage_parameters.get('config_file', None))
-
-            # Sync the above information
-            #self._smgr_cobbler.sync()
-
-            # Update Server table to add image name
-        # Update Server table to add image name
-            update = {
-                'mac_address': reimage_parameters['server_mac'],
-                'reimaged_id': base_image['id']}
-            if not self._serverDb.modify_server(update):
-                msg = "Server %s is not present" % reimage_parameters['server_id']
-                self._smgr_log.log(self._smgr_log.ERROR, msg)
-
         except Exception as e:
             msg = "Server %s reimaged failed" % server['reimage_parameters']['server_id']
+            self._smgr_log.log(self._smgr_log.ERROR, msg)
+            update = {
+                'mac_address': server['reimage_parameters']['server_mac'],
+                'status': "reimage_failed"
+            }
+            self._serverDb.modify_server(update)
+
+        # Update Server table to add image name
+        update = {
+            'mac_address': reimage_parameters['server_mac'],
+            'reimaged_id': base_image['id']}
+        if not self._serverDb.modify_server(update):
+            msg = "Server %s is not present" % reimage_parameters['server_id']
             self._smgr_log.log(self._smgr_log.ERROR, msg)
     # end _do_reimage_server
 

@@ -52,6 +52,7 @@ class BaseInterface(object):
         self.ip         = kwargs.get('ip', None)
         self.gw         = kwargs.get('gw', None)
         self.vlan       = kwargs.get('vlan', None)
+        self.dhcp       = kwargs.get('dhcp', None)
         self.bond_opts  = {'miimon': '100', 'mode': '802.3ad',
                            'xmit_hash_policy': 'layer3+4'}
         try:
@@ -207,9 +208,12 @@ class BaseInterface(object):
                'NM_CONTROLLED' : 'no',
                'HWADDR'        : mac}
         if not self.vlan:
-            cfg.update({'NETMASK'       : self.netmask,
-                        'IPADDR'        : self.ipaddr
-                       })
+            if self.dhcp:
+                cfg.update({'BOOTPROTO': 'dhcp'})
+            else:
+                cfg.update({'NETMASK'       : self.netmask,
+                            'IPADDR'        : self.ipaddr
+                            })
             if self.gw:
                 cfg['GATEWAY'] = self.gw
         else:
@@ -240,7 +244,7 @@ class BaseInterface(object):
             ip = IPNetwork(self.ip)
             self.ipaddr = str(ip.ip)
             self.netmask = str(ip.netmask)
-        else:
+        elif not self.dhcp:
             raise Exception("IP address/mask is not specified")
         if 'bond' in self.device.lower():
             self.create_bonding_interface()
@@ -329,11 +333,15 @@ class UbuntuInterface(BaseInterface):
         log.info('Creating Interface: %s' % self.device)
         mac = self.get_mac_addr(self.device)
         if not self.vlan:
-            cfg = ['auto %s' %self.device,
-                   'iface %s inet static' %self.device,
-                   'hwaddress ether %s' %mac,
-                   'address %s' %self.ipaddr,
-                   'netmask  %s' %self.netmask]
+            if self.dhcp:
+                cfg = ['auto %s' %self.device,
+                       'iface %s inet dhcp' %self.device]
+            else:
+                cfg = ['auto %s' %self.device,
+                       'iface %s inet static' %self.device,
+                       'hwaddress ether %s' %mac,
+                       'address %s' %self.ipaddr,
+                       'netmask  %s' %self.netmask]
             if self.gw:
                 cfg.append('gateway %s' %self.gw)
         else:
@@ -406,8 +414,10 @@ def parse_cli(args):
                         help='Name of Member interfaces')
     parser.add_argument('--ip', 
                         action='store',
-                        required=True,
                         help='IP address of the new Interface')
+    parser.add_argument('--dhcp',
+                        action='store_true',
+                        help='DHCP True/False')
     parser.add_argument('--gw', 
                         action='store',
                         help='Gateway Address of the Interface')
